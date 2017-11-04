@@ -2,7 +2,7 @@
 var enableAudio = false;
 var enableVideoReceive = false;
 var streamerName = "bot1";
-var socketUrl = "URL";
+var socketUrl = $BOT_HOST;
 
 // Streamer just receives calls, it does not call other clients
 // Beggins connection

@@ -1,5 +1,5 @@
 // variables
-var socket = "URL";
+var socket = $BOT_HOST;
 
 // This variables are used in order to know which key is pressed and send it to
 // bot1
