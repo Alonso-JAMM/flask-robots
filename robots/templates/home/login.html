@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block body %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/home/login.css') }}">
+    <div class="container">
+      <form action="{{ url_for('home.login') }}" method="POST" id="form-signin">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input  class="form-control" name="username" placeholder="Enter username">
+        </div>
+        <div class="form-group">
+          <label for="passwordInput">Password</label>
+          <input type="password" class="form-control" name="password" placeholder="Password">
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
+      {% if error %}<p class="error"><strong>Error:</strong>{{ error }}{% endif %}
+    </div>
+   
+{% endblock %}

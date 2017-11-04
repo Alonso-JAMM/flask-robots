@@ -1,0 +1,3 @@
+graft robots/templates
+graft robots/static
+include robots/schema.sql 

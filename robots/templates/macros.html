@@ -1,0 +1,4 @@
+{# This macro is used to hide elements but not lost their space #}
+{% macro hide() %}
+  {% if session.get('logged_in') != True %} style="visibility: hidden;" {% endif %}
+{%- endmacro %}

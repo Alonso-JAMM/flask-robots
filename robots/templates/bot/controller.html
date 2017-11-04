@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% block body %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bot/controller.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script src="URL"></script>
+    <script type="text/javascript" src="URL"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bot/video.js') }}"></script>
+
+    <div role="main" id="maind">
+      <div class="container-fluid">
+        <div class="row">
+          <div id="video">
+            <video id="caller"></video>
+          </div>
+          <div id="otherClients"></div>
+          <div id="rightControllers">
+            <div id="buttons">
+              <button id="forward" class="btn btn-dark" onclick="forward()">Forward</button>
+              <button id="back" class="btn btn-dark" onclick="back()">Back</button>
+              <button id="left" class="btn btn-dark" onclick="left()">Left</button>
+              <button id="right" class="btn btn-dark" onclick="right()">Right</button>
+              <br>
+              <br>
+              <div id="gamepadDisplay"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/bot/controls.js') }}"></script>
+{% endblock %}

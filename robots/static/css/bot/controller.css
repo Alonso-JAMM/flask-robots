@@ -1,0 +1,26 @@
+#maind{
+  margin-top: 5px;
+}
+
+#caller {
+  width: 100%;
+  max-height: 600px
+}
+
+#video {
+  width: 100%;
+  background-color: black;
+  min-width: 300px;
+  max-width: 800px;
+  min-height: 225px;
+  max-height: 600px;
+}
+
+#rightControllers {
+  width: 30%;
+  min-width: 300px;
+}
+
+#buttons {
+  margin: 15px
+}

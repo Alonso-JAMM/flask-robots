@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+{% import "macros.html" as macros %}
+<head>
+  <title>robots</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">  
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/navbar.css') }}">
+  <link rel="shortcut icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+   integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+  <script src="https://use.fontawesome.com/8630f7ed59.js"></script>
+  </head>
+
+<header>
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+      <a class="navbar-brand" id="currentPage">{{ name.upper() }}</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse"
+       data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false"
+        aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div id="navbarCollapse" class="collapse navbar-collapse">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" {{ macros.hide() }} id="navbarDropdown" href="" role="button" data-toggle="dropdown"
+              aria-haspopup="true" aria-expanded="false">
+              Projects
+            </a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                {% set i = 0 %}
+                {% for project in projects %}
+                    <a class="dropdown-item" href="{{ url_for(project['url']) }}">{{ projects[loop.index0]['name'].upper() }}</a>
+                  {% set i = i + 1 %}
+                {% endfor %}
+            </div>
+          </li>
+        </ul>
+        <ul class="navbar-nav" {{ macros.hide() }}>
+            <li class="nav-item active">
+                <a class="navbar-brand fixed" href="{{ url_for('home.index') }}">
+                    <i class="fa fa-home fa-lg"></i>                
+                </a>
+            </li>
+            <li class="nav-item active">
+                <a class="navbar-brand fixed" href="{{ url_for('home.logout') }}">
+                    <i class="fa fa-sign-out fa-lg"></i>
+                  </a>
+            </li>
+        </ul>
+      </div>
+    </nav> 
+  </header>
+  <br>
+  <br>
+
+{% block body %}{% endblock %}

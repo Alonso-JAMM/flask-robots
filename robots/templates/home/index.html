@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block body %}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/home/index.css') }}">
+  <main role="main">
+    <div class="album text-muted">
+      <div class="container-fluid">
+        <div class="row">
+          {% for project in projects %}
+            <div class="card">
+              <a href="{{ project['name'] }}">
+                <img src="{{ url_for('static', filename='images/' + project['picture']) }}" style="height: 200px;
+                  width:100%; max-width: 300px; display: block;">
+              </a>
+              <p class="card-text">
+                 {{ project[1].upper() }}
+               </p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </main>
+{% endblock %}

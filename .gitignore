@@ -1,0 +1,8 @@
+*.pyc
+.metadata/*
+.vscode/*
+robots.egg-info/*
+*.db
+venv/*
+.idea/*
+robots/views/__pycache__
