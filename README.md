@@ -33,7 +33,7 @@ This small website is the host of my other projects
      ```
       sqlite3 robots.db < schema.sql
      ```
-3. Put the URL to the easyrtc server of bot1 in macro **bot_host().** Example:
+3. Put the URL to the easyrtc server of bot1 in macro **bot_host()** in *robots/templates/macros.html* Example:
 ```
 {%macro bot_host()%}http://example.com{%- endmacro %}
 ```
