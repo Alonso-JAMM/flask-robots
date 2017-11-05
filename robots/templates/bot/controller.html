@@ -6,8 +6,8 @@
     <script>
       $BOT_HOST="{{macros.bot_host()}}";
     </script>
+    <script type="text/javascript" src="{{ macros.bot_host() }}/socket.io/socket.io.js"></script>
     <script src="{{ macros.bot_host() }}/easyrtc/easyrtc.js"></script>
-    <script type="text/javascript" src="{{ macros.bot_host() }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/bot/video.js') }}"></script>
 
     <div role="main" id="maind">
