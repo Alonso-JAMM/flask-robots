@@ -56,6 +56,13 @@ Now its time to run the app, there are 3 options:
   flask run --host=IP_ADDRESS:PORT
 ```
 
+3. In the file **robots/templates/macros.html** change value of **URL** in the macro **bot_host** to 
+the url that is used to host the easyrtc server that controls the bot. Not use quotation marks, they are 
+needed. Example:
+```
+  http://example.com
+```
+
 And you can access to the app from any browser
 ```
   http://127.0.0.1:5000/
