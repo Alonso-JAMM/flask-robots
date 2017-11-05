@@ -48,8 +48,8 @@ Then do this:
   >> os.urandom(24)
   '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
 ```
-      I took it from the flask [documentation](http://flask.pocoo.org/docs/0.12/quickstart/). 
-      Copy the string in the file.
+   I took it from the flask [documentation](http://flask.pocoo.org/docs/0.12/quickstart/). 
+   Copy the string in the file.
 
 
 ## Running the app
