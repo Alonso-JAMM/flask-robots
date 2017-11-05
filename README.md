@@ -33,6 +33,10 @@ This small website is the host of my other projects
      ```
       sqlite3 robots.db < schema.sql
      ```
+3. Put the URL to the easyrtc server of bot1 in macro **bot_host().** Example:
+```
+{%macro bot_host()%}http://example.com{%- endmacro %}
+```
 
 ## Running the app
 Now its time to run the app, there are 3 options:
