@@ -45,9 +45,10 @@ encryp cookies that are used in sessions. You can generate the key by enteryng i
 Then do this:
 ```
   >>> import os
-  >> os.urandom(24)
+  >>> os.urandom(24)
   '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
 ```
+
    I took it from the flask [documentation](http://flask.pocoo.org/docs/0.12/quickstart/). 
    Copy the string in the file.
 
@@ -72,7 +73,7 @@ Now its time to run the app, there are 3 options:
    If you want to change the host ip address or the port
 ```
   flask run --host=IP_ADDRESS:PORT
-``` I
+``` 
 
 And you can access to the app from any browser
 ```
