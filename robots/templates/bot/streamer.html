@@ -3,7 +3,7 @@
 {% block body %}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bot/streamer.css') }}">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-    <script type="text/javascript">
+    <script>
         $BOT_HOST = "{{ macros.bot_host() }}";
     </script>
     <script src="{{ macros.bot_host() }}/socket.io/socket.io.js"></script>

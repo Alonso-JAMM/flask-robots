@@ -1,5 +1,5 @@
 // Variables
-var socketUrl = "URL";
+var socketUrl = $BOT_HOST;
 
 // Initializes the connection to the easyrtc server
 window.onload=my_init();
