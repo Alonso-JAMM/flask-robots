@@ -33,10 +33,23 @@ This small website is the host of my other projects
      ```
       sqlite3 robots.db < schema.sql
      ```
-3. Put the URL to the easyrtc server of bot1 in macro **bot_host()** in *robots/templates/macros.html* Example:
+3. In the file **robots/templates/macros.html** change value of **URL** in the macro **bot_host** to 
+the url that is used to host the easyrtc server that controls the bot. Not use quotation marks, they are 
+needed. Example:
 ```
-{%macro bot_host()%}http://example.com{%- endmacro %}
+  http://example.com
 ```
+
+4. **Secure Key** you can generate it and put it in **SECRET_KEY** in **robots/__init__.py**. The key is used to 
+encryp cookies that are used in sessions. You can generate the key by enteryng in the terminal and run python. 
+Then do this:
+```
+  >>> import os
+  >> os.urandom(24)
+  '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
+```
+      I took it from the flask [documentation](http://flask.pocoo.org/docs/0.12/quickstart/). Copy the string in the file.
+
 
 ## Running the app
 Now its time to run the app, there are 3 options:
@@ -58,14 +71,7 @@ Now its time to run the app, there are 3 options:
    If you want to change the host ip address or the port
 ```
   flask run --host=IP_ADDRESS:PORT
-```
-
-3. In the file **robots/templates/macros.html** change value of **URL** in the macro **bot_host** to 
-the url that is used to host the easyrtc server that controls the bot. Not use quotation marks, they are 
-needed. Example:
-```
-  http://example.com
-```
+``` I
 
 And you can access to the app from any browser
 ```
