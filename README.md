@@ -40,8 +40,8 @@ needed. Example:
   http://example.com
 ```
 
-4. **Secure Key** you can generate it and put it in **SECRET_KEY** in **robots/__init__.py**. The key is used to 
-encryp cookies that are used in sessions. You can generate the key by enteryng in the terminal and run python. 
+4. **Secure Key** you can generate it and put it in **SECRET_KEY** in **robots/custom_config.py**. The key is used to 
+encrypt cookies that are used in sessions. You can generate the key by enteryng in the terminal and run python. 
 Then do this:
 ```
   >>> import os
@@ -51,6 +51,12 @@ Then do this:
 
    I took it from the flask [documentation](http://flask.pocoo.org/docs/0.12/quickstart/). 
    Copy the string in the file.
+
+
+## Configuration
+There is a default configuration file in the directory **robots**. If a file called **custom_config.py**
+is created in **robots** then the app will use it instead of the default file. It is useful to configure 
+the **SECRET_KEY** for different environments.
 
 
 ## Running the app
@@ -72,16 +78,12 @@ Now its time to run the app, there are 3 options:
    
    If you want to change the host ip address or the port
 ```
-  flask run --host=IP_ADDRESS:PORT
+  flask run --port=PORT
 ``` 
 
 And you can access to the app from any browser
 ```
-  http://127.0.0.1:5000/
-```
-or
-```
-  http://IP_ADDRESS:PORT
+  http://127.0.0.1:PORT/
 ```
 
 ### Using the run.py file

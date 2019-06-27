@@ -6,3 +6,5 @@ robots.egg-info/*
 venv/*
 .idea/*
 robots/views/__pycache__
+custom_config.py
+TODO.md
