@@ -49,7 +49,7 @@ Then do this:
   '\xfd{H\xe5<\x95\xf9\xe3\x96.5\xd1\x01O<!\xd5\xa2\xa0\x9fR"\xa1\xa8'
 ```
 
-   I took it from the flask [documentation](http://flask.pocoo.org/docs/0.12/quickstart/). 
+   I took it from the flask [documentation](http://flask.pocoo.org/docs/1.0/quickstart/). 
    Copy the string in the file.
 
 
