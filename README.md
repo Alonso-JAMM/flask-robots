@@ -86,20 +86,6 @@ And you can access to the app from any browser
   http://127.0.0.1:PORT/
 ```
 
-### Using the run.py file
-It is somewhat faster than running the app manually. However you can't change debug mode (it is on by default). 
-Also the app is run in the default ip (**127.0.0.1**) and port (**5000**)
-
-1. If the virtualenv has not been activated, activate it. From the root directory of the project
-```
-  . venv/bin/activate
-```
-
-2. Then run the **run.py** file that is in the root directory of the project
-```
-  python run.py
-```
-
 ### Using WSGI
 For more information go [here](http://flask.pocoo.org/docs/0.12/deploying/mod_wsgi/)
 

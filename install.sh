@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# TODO: It first need to check if virtualenv is installed
 virtualenv -p python3 venv
  
 . venv/bin/activate

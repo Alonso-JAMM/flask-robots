@@ -1,5 +1,5 @@
 from robots import helpers, wrappers
-from flask import Blueprint, session, render_template, redirect, url_for, request, flash
+from flask import Blueprint, session, render_template, redirect, url_for, request, current_app
 
 home = Blueprint('home', __name__)
 

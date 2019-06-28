@@ -1,10 +1,10 @@
 from flask import g
 import sqlite3
-from robots import app
-
+# from robots import app
+from flask import current_app
 
 def connect_db():
-    rv = sqlite3.connect(app.config['DATABASE'])
+    rv = sqlite3.connect(current_app.config['DATABASE'])
     rv.row_factory = sqlite3.Row
     return rv
 
