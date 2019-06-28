@@ -87,7 +87,7 @@ And you can access to the app from any browser
 ```
 
 ### Using WSGI
-For more information go [here](http://flask.pocoo.org/docs/0.12/deploying/mod_wsgi/)
+For more information go [here](http://flask.pocoo.org/docs/1.0/deploying/mod_wsgi/)
 
 Example of the apache site file conf I used. (I used SSL)
 ```
