@@ -1,7 +1,7 @@
 from flask import g
 import sqlite3
-# from robots import app
 from flask import current_app
+
 
 def connect_db():
     rv = sqlite3.connect(current_app.config['DATABASE'])
@@ -70,6 +70,9 @@ class User:
         else:
             return False
 
+    def user_info(self):
+        return get_user_data(self.username)
+
     def create(self, password):
         if not self.__is_in_database():
             self.db.cursor().execute("INSERT INTO users (username, password) values (?,?)",
@@ -85,13 +88,13 @@ class User:
 
     def change_password(self, new_password):
         if self.__is_in_database():
-            self.db.cursor().execute("UPDATE users SET password = ?", (new_password,))
+            self.db.cursor().execute("UPDATE users SET password = ? WHERE username = ?", (new_password, self.username))
             self.db.commit()
             print(self.username + "'s password has changed!")
 
     def change_username(self, new_username):
         if self.__is_in_database():
-            self.db.cursor().execute("UPDATE users SET username = ?", (new_username,))
+            self.db.cursor().execute("UPDATE users SET username = ? WHERE username = ?", (new_username, self.username))
             self.db.commit()
             print(self.username + " changed to " + new_username)
 
@@ -108,6 +111,9 @@ class Project:
         else:
             return False
 
+    def project_info(self):
+        return get_project_data(self.name)
+
     def create(self, url, page, picture):
         if not self.__is_in_database():
             self.db.cursor().execute("INSERT INTO projects (name, url, page, picture) values "
@@ -123,24 +129,24 @@ class Project:
 
     def change_name(self, new_name):
         if self.__is_in_database():
-            self.db.cursor().execute("UPDATE projects SET name = ?", (new_name,))
+            self.db.cursor().execute("UPDATE projects SET name = ? WHERE name = ?", (new_name, self.name))
             self.db.commit()
             print(self.name + " changed to " + new_name)
 
     def change_url(self, new_url):
         if self.__is_in_database():
-            self.db.cursor().execute("UPDATE projects SET url = ?", (new_url,))
+            self.db.cursor().execute("UPDATE projects SET url = ? WHERE name = ?", (new_url, self.name))
             self.db.commit()
-            print("Changed url of" + self.name)
+            print("Changed url of " + self.name)
 
     def change_page(self, new_page):
         if self.__is_in_database():
-            self.db.cursor().execute("UPDATE projects SET page = ?", (new_page,))
+            self.db.cursor().execute("UPDATE projects SET page = ? WHERE name = ?", (new_page, self.name))
             self.db.commit()
             print("Changed page of " + self.name)
 
     def change_picture(self, new_picture):
         if self.__is_in_database():
-            self.db.cursor().execute("UPDATE projects SET picture = ?", (new_picture,))
+            self.db.cursor().execute("UPDATE projects SET picture = ? WHERE name = ?", (new_picture, self.name))
             self.db.commit()
             print("Changed picture of " + self.name)

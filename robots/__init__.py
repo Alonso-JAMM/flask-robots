@@ -3,7 +3,7 @@ import os
 
 
 # Use a factory for making better tests
-def create_app(config_file):
+def create_app():
     app = Flask(__name__)
     # app.config.from_pyfile(config_file)
 
@@ -19,8 +19,13 @@ def create_app(config_file):
 
     # Need to be imported after configuration
     from robots.views import bot, home  # from robots import views
-    from robots import custom_cli
     app.register_blueprint(bot.bot_1)
     app.register_blueprint(home.home)
 
+
+    with app.app_context():
+        from robots import custom_cli
+
     return app
+
+
