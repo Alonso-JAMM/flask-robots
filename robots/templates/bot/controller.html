@@ -2,19 +2,21 @@
 {% import "macros.html" as macros %}
 {% block body %}
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/bot/controller.css') }}">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/janus.js')}}"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/webrtc-adapter/6.4.0/adapter.min.js" ></script>
+<!--     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script> -->
     <script>
       $BOT_HOST="{{macros.bot_host()}}";
     </script>
-    <script type="text/javascript" src="{{ macros.bot_host() }}/socket.io/socket.io.js"></script>
-    <script src="{{ macros.bot_host() }}/easyrtc/easyrtc.js"></script>
+<!--     <script type="text/javascript" src="{{ macros.bot_host() }}/socket.io/socket.io.js"></script> -->
+<!--     <script src="{{ macros.bot_host() }}/easyrtc/easyrtc.js"></script> -->
     <script type="text/javascript" src="{{ url_for('static', filename='js/bot/video.js') }}"></script>
 
     <div role="main" id="maind">
       <div class="container-fluid">
         <div class="row">
           <div id="video">
-            <video id="caller"></video>
+            <video id="caller" autoplay playsinline></video>
           </div>
           <div id="otherClients"></div>
           <div id="rightControllers">
@@ -31,5 +33,5 @@
         </div>
       </div>
     </div>
-    <script src="{{ url_for('static', filename='js/bot/controls.js') }}"></script>
+<!--     <script src="{{ url_for('static', filename='js/bot/controls.js') }}"></script> -->
 {% endblock %}

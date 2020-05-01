@@ -1,33 +1,112 @@
 // variables
-var enableAudio = false;
-var enableVideoReceive = false;
-var streamerName = "bot1";
-var socketUrl = $BOT_HOST;
+var enable_audio = false;
+var streamer_name = "bot1";
+var socket_url = $BOT_HOST;
 
-// Streamer just receives calls, it does not call other clients
+
+
+window.onload = stream();
+
+
+
 // Beggins connection
 function stream() {
-  easyrtc.setSocketUrl(socketUrl);
-  var name = document.getElementById("bot_name").value;
-  if(name != "") {
-    streamerName = name;
-  }
-  easyrtc.enableAudio(enableAudio);
-  easyrtc.enableVideoReceive(enableVideoReceive);
-  easyrtc.setUsername(streamerName);
-  var connectSuccess = function(myId) {
-    console.log("My easyrtcid is" + myId);
-    console.log(easyrtc.idToName(myId));
-  }
-  var connectFailure = function(errmesg) {
-    console.log(errmesg);
-  }
-  easyrtc.initMediaSource(
-    function() {    // success callback
-      var selfVideo = document.getElementById("self");
-      easyrtc.setVideoObjectSrc(selfVideo, easyrtc.getLocalStream());
-      easyrtc.connect("Client-Line", connectSuccess, connectFailure);
-    },
-    connectFailure
-  );
+    Janus.init({
+        debug: true,
+        callback: function() {
+            console.log("Janus initialized");
+            janus = new Janus({
+                server: "https://classickerobel.duckdns.org:8081/janus",
+                success: function() {
+                    console.log("Connected to server!");
+                    // attach to pluggin
+                    janus_attach();
+
+                },
+                error: function(cause) {
+                    console.log("ERROR: " + cause);
+                }
+            });
+        }
+    });
+}
+
+
+function janus_attach() {
+    janus.attach({
+        plugin: "janus.plugin.videoroom",
+        success: function(plugin_handle) {
+            console.log("Plugin attached!");
+            videoroom = plugin_handle;
+            videoroom.simulcastStarted = false;
+            // register name
+            var name = document.getElementById("bot_name").value;
+            if (name == "") {
+                name = streamer_name;
+            }
+            videoroom.send({
+                "message": {
+                    "request": "join",
+                    "room": 1234,
+                    "ptype": "publisher",
+                    "display": name
+                }
+            });
+        },
+        error: function(cause) {
+            console.log(cause);
+        },
+        consentDialog: function(on) {
+            if (on) {
+                console.log("On");
+            }
+        },
+        onmessage: function(msg, jsep) {
+            var event = msg["videoroom"];
+            if (event !== undefined && event !== null) {
+                if (event == "joined") {
+                    make_offer();
+                }
+                if (jsep !== undefined && jsep !== null) {
+                    videoroom.handleRemoteJsep({"jsep": jsep});
+                }
+            }
+        },
+        onremotestream: function(stream) {
+            console.log("remote stream " + stream);
+        },
+        ondataopen: function(data) {
+            console.log("Data channel " + data);
+        },
+        ondata: function(data) {
+            console.log("We got data from the data channel " + data);
+        },
+        
+    });
+}
+
+
+function make_offer() {
+    videoroom.createOffer({
+        media: {
+            audio: true,
+            videoRecv: false,
+            videoSend: true,
+            data: false
+        },
+        success: function(jsep) {
+            videoroom.send({
+                "message": {
+                    "request": "publish",
+                    "audio": false,
+                    "video": true,
+                    "data": true
+                },
+                "jsep": jsep
+            });
+        },
+        error: function(cause) {
+            console.log(cause);
+        }
+    });
 }

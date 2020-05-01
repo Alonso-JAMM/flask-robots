@@ -8,3 +8,6 @@ venv/*
 robots/views/__pycache__
 custom_config.py
 TODO.md
+install.sh
+build/*
+dist/*

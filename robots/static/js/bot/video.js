@@ -1,70 +1,142 @@
 // Variables
 var socketUrl = $BOT_HOST;
+var janus = null;
+var videoroom = null;
 
-// Initializes the connection to the easyrtc server
 window.onload=my_init();
 
-// This callback is called when a call begins
-easyrtc.setStreamAcceptor( function(callerEasyrtcid, stream) {
-  var video = document.getElementById('caller');
-  easyrtc.setVideoObjectSrc(video, stream);
-});
 
-// This callback is called when the call ends
-easyrtc.setOnStreamClosed( function(callerEasyrtcid) {
-  easyrtc.setVideoObjectSrc(document.getElementById('caller'), "");
-  // This part makes buttons to call other clients appear
-  // And disappear the video element
-  var otherClientDiv = document.getElementById('otherClients');
-  var video = document.getElementById('video');
-  otherClientDiv.style.display = "initial";
-});
-
-// Initializes the connection to easyrtc server
+// Initializes the connection to janus server
 function my_init() {
-  easyrtc.setSocketUrl(socketUrl);
-  easyrtc.enableAudio(false);
-  easyrtc.enableVideo(false);
-  easyrtc.setRoomOccupantListener( loggedInListener );
-  var connectSuccess = function(myId) {
-    console.log("My easyrtcid is" + myId + easyrtc.idToName(myId));
-  }
-  var connectFailure = function(errmesg) {
-    console.log(errmesg);
-  }
-  easyrtc.connect("Client-Line", connectSuccess, connectFailure);
+    // Initialize the library 
+    Janus.init({
+        debug: true,
+        callback: function() {
+            console.log("Janus initialized");
+            janus = new Janus({
+                server: "https://classickerobel.duckdns.org:8081/janus",
+                success: function() {
+                    console.log("Connected to server!");
+                    // attach to pluggin
+                    janus_attach();
+
+                },
+                error: function(cause) {
+                    console.log("ERROR: " + cause);
+                }
+            });
+        }
+    });
 }
 
-// This callback regenates new buttons and erases buttons to call other clients
-function loggedInListener(roomName, otherPeers) {
-  var otherClientDiv = document.getElementById('otherClients');
-  var video = document.getElementById('video');
-  while (otherClientDiv.hasChildNodes()) {
-  otherClientDiv.removeChild(otherClientDiv.lastChild);
-  }
-  for (var i in otherPeers) {
-    var button = document.createElement('button');
-    button.onclick = function(easyrtcid) {
-      return function() {
-        performCall(easyrtcid);
-        otherClientDiv.style.display = "none";
-      }
-    }(i);
 
-    label = document.createTextNode(easyrtc.idToName(i));
-    button.appendChild(label);
-    otherClientDiv.appendChild(button);
-  }
+function janus_attach() {
+    janus.attach({
+        plugin: "janus.plugin.videoroom",
+        success: function(plugin_handle) {
+            console.log("Plugin attached!");
+            videoroom = plugin_handle;
+            
+            videoroom.simulcastStarted = false;
+            
+            
+            // register name
+            videoroom.send({
+                "message": {
+                    "request": "listparticipants",
+                    "room": 1234
+                },
+                success: function(result) {
+                    // Now we can find the robot
+                    for (participant of result.participants) {
+                        if (participant.publisher == true){
+                            var btn = document.createElement("BUTTON");
+                            btn.innerHTML = participant.display;
+                            btn.onclick = function() {subscribe(participant.id);};
+                            document.getElementById("otherClients").appendChild(btn);
+                        }
+                    }
+                    participans_b = document.getElementById("otherClients").children;
+                    if (participans_b.length == 0){
+                        document.getElementById("otherClients").innerHTML = "No publishers";
+                    }
+                }
+            });
+        },
+        error: function(cause) {
+            console.log("Some error while attaching");
+            console.log(cause);
+        },
+        consentDialog: function(on) {
+            if (on) {
+                console.log("On");
+            }
+        },
+        onmessage: function(msg, jsep) {
+            var event = msg["videoroom"];
+            if (event != undefined && event != null){
+                if (event === "attached"){
+                    videoroom.rfid = msg["id"];
+                    videoroom.rfdisplay = msg["display"];
+                    Janus.log(" <<<>>>>Successfully attachedroom " + msg["room"]);
+//                     if(msg["publishers"] !== undefined && msg["publishers"] !== null) {
+//                         // assuming only one publisher
+//                         var id = msg["publishers"][0]["id"];
+//                         var video_codec = msg["publishers"][0]["video_codec"];
+//                         Janus.debug(" >> [" + id + "] " + "video: " + video_codec);
+//                     }
+                }
+            }
+            if(jsep !== undefined && jsep !== null) {
+                videoroom.createAnswer({
+                    jsep: jsep,
+                    media: {
+                        audioSend: false,
+                        videoSend: false,
+                        videoRecv: true
+                    },
+                    success: function(jsep) {
+                        videoroom.send({
+                            "message": {
+                                "request": "start",
+                                "room": 1234
+                            },
+                            "jsep": jsep
+                        });
+                    }
+                });
+            }
+        },
+        onremotestream: function(stream) {
+            console.log("remote stream " + stream);
+            var videoPlayer = document.getElementById("caller");
+//             videoPlayer.srcObject = stream;
+            Janus.attachMediaStream(videoPlayer, stream);
+        },
+        ondataopen: function(data) {
+            console.log("Data channel " + data);
+        },
+        ondata: function(data) {
+            console.log("We got data from the data channel " + data);
+        },
+        oncleanup: function() {
+            Janus.log(" >>>> Got a cleanup notification")
+        }
+        
+    });
 }
 
-// This function calls the other client
-function performCall(easyrtcid) {
-  easyrtc.call(
-    easyrtcid,
-    function(easyrtcid) { console.log("completed call to " + easyrtcid);},
-    function(errorMessage) { console.log("err:" + errorMessage);},
-    function(accepted, bywho) {
-      console.log((accepted?"accepted":"rejected") + " by " + bywho);
-    }
-  );
+
+function subscribe(publisher_id) {
+    // subscribes to publisher feed
+    console.log("Connecting to publishe-----------------------------------------------------r");
+    videoroom.send({
+        "message": {
+            "request": "join",
+            "ptype": "subscriber",
+            "room": 1234,
+            "feed": publisher_id,
+            "offer_audio": false,
+        }
+    });
 }
