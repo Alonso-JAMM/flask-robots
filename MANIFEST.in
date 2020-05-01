@@ -1,3 +1,7 @@
-graft robots/templates
-graft robots/static
+#graft robots/templates
+#graft robots/static
 include robots/schema.sql 
+include robots/robots.db
+recursive-include robots/templates *
+recursive-include robots/static *
+recursive-include robots/views *
