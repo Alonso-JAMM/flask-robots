@@ -2,6 +2,7 @@
 var socketUrl = $BOT_HOST;
 var janus = null;
 var videoroom = null;
+var textroom = null;
 
 window.onload=my_init();
 
@@ -19,7 +20,7 @@ function my_init() {
                     console.log("Connected to server!");
                     // attach to pluggin
                     janus_attach();
-
+                    textClient();
                 },
                 error: function(cause) {
                     console.log("ERROR: " + cause);
@@ -124,6 +125,7 @@ function janus_attach() {
         }
         
     });
+//     textClient();
 }
 
 
@@ -139,4 +141,80 @@ function subscribe(publisher_id) {
             "offer_audio": false,
         }
     });
+}
+
+
+function textClient() {
+    janus.attach({
+        plugin: "janus.plugin.textroom",
+        success: function(pluginHandle) {
+            console.log("Text room plugin attached");
+            textroom = pluginHandle;
+            var body = {"request": "setup"};
+
+            textroom.send({"message": body});
+        },
+        error: function(error) {
+            console.log("Error attaching plugin", error);
+        },
+        webrtcState: function(on) {
+            // webrtc is on, we can join to the room
+            console.log("Joining Text Room");
+            var transaction = randomString(12);
+            var username = randomString(12);
+            var message = {
+                textroom: "join",
+                transaction: transaction,
+                room: 1234,
+                username: username,
+                display: "Controller",
+            };
+
+            textroom.data({
+                text: JSON.stringify(message),
+                error: function(error) {
+                    console.log("Joining error", error);
+                }
+            });
+        },
+        onmessage: function(msg, jsep) {
+            if (msg["error"] !== undefined && msg["error"] !== null) {
+                console.log("Received error message", msg);
+            }
+            if (jsep !== undefined  && jsep !== null) {
+                // Creating answer
+                textroom.createAnswer({
+                    jsep: jsep,
+                    media: {audio: false, video: false, data: true},
+                    success: function(jsep) {
+                        var body = {"request": "ack"};
+                        textroom.send({"message": body, "jsep": jsep});
+                    },
+                    error: function(error) {
+                        console.log("Could not make an answer", error);
+                    }
+                });
+            }
+        },
+        ondataopen: function(data) {
+            console.log("ondataopen ", data);
+        },
+        ondata: function(data) {
+            console.log("data ", data);
+        },
+        oncleanup: function() {
+            console.log("cleanup");
+        }
+    });
+}
+
+
+function randomString(len){
+    charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var string = '';
+    for (var i=0;  i<len; i++) {
+        var randomPoz = Math.floor(Math.random() * charSet.length);
+        string += charSet.substring(randomPoz, randomPoz+1);
+    }
+    return string;
 }
