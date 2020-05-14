@@ -33,7 +33,7 @@ function my_init() {
 
 function janus_attach() {
     janus.attach({
-        plugin: "janus.plugin.videoroom",
+        plugin: "janus.plugin.streaming",
         success: function(plugin_handle) {
             console.log("Plugin attached!");
             videoroom = plugin_handle;
@@ -44,23 +44,34 @@ function janus_attach() {
             // register name
             videoroom.send({
                 "message": {
-                    "request": "listparticipants",
-                    "room": 1234
-                },
+                    "request": "info",
+                    "id": 1
+                }
+                ,
                 success: function(result) {
-                    // Now we can find the robot
-                    for (participant of result.participants) {
-                        if (participant.publisher == true){
-                            var btn = document.createElement("BUTTON");
-                            btn.innerHTML = participant.display;
-                            btn.onclick = function() {subscribe(participant.id);};
-                            document.getElementById("otherClients").appendChild(btn);
+                    // Now try to watch
+                    videoroom.send({
+                        "message": {
+                            "request": "watch",
+                            "id": 1,
+                            "offer_audio": false,
+                            "offer_video": true,
+                            "offer_data": false
                         }
-                    }
-                    participans_b = document.getElementById("otherClients").children;
-                    if (participans_b.length == 0){
-                        document.getElementById("otherClients").innerHTML = "No publishers";
-                    }
+                    });
+                    // Now we can find the robot
+//                     for (participant of result.participants) {
+//                         if (participant.publisher == true){
+//                             var btn = document.createElement("BUTTON");
+//                             btn.innerHTML = participant.display;
+//                             btn.onclick = function() {subscribe(participant.id);};
+//                             document.getElementById("otherClients").appendChild(btn);
+//                         }
+//                     }
+//                     participans_b = document.getElementById("otherClients").children;
+//                     if (participans_b.length == 0){
+//                         document.getElementById("otherClients").innerHTML = "No publishers";
+//                     }
                 }
             });
         },
@@ -76,17 +87,27 @@ function janus_attach() {
         onmessage: function(msg, jsep) {
             var event = msg["videoroom"];
             if (event != undefined && event != null){
-                if (event === "attached"){
-                    videoroom.rfid = msg["id"];
-                    videoroom.rfdisplay = msg["display"];
-                    Janus.log(" <<<>>>>Successfully attachedroom " + msg["room"]);
+                if (event === "preparing") {
+                    videoroom.send({
+                        "message": {
+                            "request": "start"
+                        }
+                    });
+                }
+                if (event === "staring") {
+                    console.log("starting stream");
+                }
+//                 if (event === "attached"){
+//                     videoroom.rfid = msg["id"];
+//                     videoroom.rfdisplay = msg["display"];
+//                     Janus.log(" <<<>>>>Successfully attachedroom " + msg["room"]);
 //                     if(msg["publishers"] !== undefined && msg["publishers"] !== null) {
 //                         // assuming only one publisher
 //                         var id = msg["publishers"][0]["id"];
 //                         var video_codec = msg["publishers"][0]["video_codec"];
 //                         Janus.debug(" >> [" + id + "] " + "video: " + video_codec);
 //                     }
-                }
+//                 }
             }
             if(jsep !== undefined && jsep !== null) {
                 videoroom.createAnswer({
@@ -125,7 +146,6 @@ function janus_attach() {
         }
         
     });
-//     textClient();
 }
 
 
@@ -200,7 +220,7 @@ function textClient() {
             console.log("ondataopen ", data);
         },
         ondata: function(data) {
-            console.log("data ", data);
+//             console.log("data ", data);
         },
         oncleanup: function() {
             console.log("cleanup");
@@ -217,4 +237,17 @@ function randomString(len){
         string += charSet.substring(randomPoz, randomPoz+1);
     }
     return string;
+}
+
+
+function sendData(data) {
+    var message = {
+        textroom: "message",
+        room: 1234,
+        text: data,
+        transaction: randomString(12),
+    };
+    textroom.data({
+        text: JSON.stringify(message)
+    });
 }
