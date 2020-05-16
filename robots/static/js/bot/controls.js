@@ -1,15 +1,36 @@
-// variables
-var socket = $BOT_HOST;
-
 // This variables are used in order to know which key is pressed and send it to
 // bot1
 var LEFT = false;
 var RIGHT = false;
 var BACK = false;
 var FORWARD = false;
-// This variables are used in order to know the speed for each motor of bot1
+var MOVE = false;
+var LEDTOGGLE = false;
+var LEDSTRIPSEND = false;   // used to know if we have  to send new message
+var LEDIRTOGGLE = false;
+
+var LEDIRINC = false;
+var LEDIRDEC = false
+
+// This variables are used in order to know the speed for each motor of bot1 and leds
 var speed1;
 var speed2;
+var ledStripPWM = 0;
+var ledIrPWM = 0;
+
+// variables to make toggle functionality
+var isledStripKey = false;     // is ledStrip key down?
+var isledIrKey = false;
+
+var isPressed = {
+    R: false,
+    F: false,
+    W: false,
+    S: false,
+    D: false,
+    A: false,
+};
+
 // This variable is used to know whether the gamepad is being used
 var isGp = false;
 // This variable is used to know which keys are pressed at any time, it helps to
@@ -18,59 +39,149 @@ var map = {};
 // This variable is used to know if a gamepad is connected to the pc
 var hasGamePad = false;
 
+var maxPWM = 255;
 
-// Connects to messages app/socket.io message server
-// it is used to send movement information to bot1
-// and send back data from bot1
-var socket = io.connect(socket);
-
-
-// in order to be capable of have multiple inputs
-// at the same time
-onkeydown = onkeyup = function(e){
+onkeydown = function(e) {
     e = e || event;
-    map[e.keyCode] = e.type == 'keydown';
-    speed1 = 255;
-    speed2 = 255;
-    isGp = false;
 
-    // sets true
-    // left
-    if (map[65]) {
-      LEFT = true;
-    }
-    // right
-    if (map[68]) {
-      RIGHT = true;
-    }
-    // forward
-    if (map[87]) {
-      FORWARD = true;
-    }
-    // back
-    if(map[83]) {
-      BACK = true;
+    // W - move forward
+    if (e.keyCode == 87) {
+        if (!isPressed.W) {
+            isPressed.W = true;
+            MOVE = true;
+        }
     }
 
-    // sets false
-    // left
-    if (!map[65]) {
-      LEFT = false;
+    // S - move backwards
+    if (e.keyCode == 83) {
+        if (!isPressed.S) {
+            isPressed.S = true;
+            MOVE = true;
+        }
     }
-    // right
-    if (!map[68]) {
-      RIGHT = false;
+
+    // D - move to the right
+    if (e.keyCode == 68) {
+        if (!isPressed.D) {
+            isPressed.D = true;
+            MOVE = true;
+        }
     }
-    // forward
-    if (!map[87]) {
-      FORWARD = false;
+
+    // A - move to the left
+    if (e.keyCode == 65) {
+        if (!isPressed.A) {
+            isPressed.A = true;
+            MOVE = true;
+        }
     }
-    // back
-    if(!map[83]) {
-      BACK = false;
+
+    // Q - Led strip Toggle
+    if (e.keyCode == 81) {
+        if (!isledStripKey) {
+            isledStripKey = true;
+            LEDTOGGLE = !LEDTOGGLE;
+            if (LEDTOGGLE) {
+                sendData("<L1 255>")    // Turn on
+            }
+            else {
+                sendData("<L1 0>");     // Turn off
+            }
+        }
+    }
+
+    // Same than for the led Strip
+    // E - IR led Toggle
+    if (e.keyCode == 69) {
+        if (!isledIrKey) {
+            isledStripKey = true;
+            LEDIRTOGGLE = !LEDIRTOGGLE;
+            if (LEDIRTOGGLE) {
+                sendData("<L2 255>");
+            }
+            else {
+                sendData("<L2 0>");
+            }
+        }
+    }
+
+    // No toggle events
+    // R - led strip increment
+    if (e.keyCode == 82) {
+        if (!isPressed.R) {
+            isPressed.R = true;
+            LEDSTRIPSEND = true;
+            LEDTOGGLE = true;
+        }
+    }
+    // F - led strip decrement
+    if (e.keyCode == 70) {
+        if (!isPressed.F) {
+            isPressed.F = true;
+            LEDSTRIPSEND = true;
+            LEDTOGGLE = false;
+        }
     }
 }
 
+onkeyup = function(e) {
+    e = e || event;
+
+    if (e.keyCode == 87) {
+        isPressed.W = false;
+        MOVE = true;
+        if (!isPressed.S || !isPressed.D || !isPressed.A) {
+            sendData("<M 0 0>");
+        }
+    }
+
+    if (e.keyCode == 83) {
+        isPressed.S = false;
+        MOVE = true;
+        if (!isPressed.W || !isPressed.D || !isPressed.A) {
+            sendData("<M 0 0>")
+        }
+    }
+
+    if (e.keyCode == 68) {
+        isPressed.D = false;
+        MOVE = true;
+        if (!isPressed.S || !isPressed.W || !isPressed.A) {
+            sendData("<M 0 0>")
+        }
+    }
+    if (e.keyCode == 65) {
+        isPressed.A = false;
+        MOVE = true;
+        if (!isPressed.S || !isPressed.W || !isPressed.D) {
+            sendData("<M 0 0>")
+        }
+    }
+
+    if (e.keyCode == 81) {
+        // Reset state of key
+        isledStripKey = false;
+    }
+
+    if (e.keyCode == 69) {
+        isledIrKey = false;
+    }
+
+    if (e.keyCode == 82) {
+        isPressed.R = false;
+        LEDSTRIPSEND = true;
+        if (!isPressed.F) {
+            sendData("<L1S>");
+        }
+    }
+    if (e.keyCode == 70) {
+        isPressed.F = false;
+        LEDSTRIPSEND = true;
+        if (!isPressed.R) {
+            sendData("<L1S>");
+        }
+    }
+}
 
 // Gamepad code, this code is used to detect joystic position from the Gamepad
 // now it only uses data from left analog stick, but also can be used all the other
@@ -131,32 +242,26 @@ $(document).ready(function(){
   }
 });
 
-//  Here socket.io functions begin!
-
-socket.on('connection', function(socket){
-  console.log('Connected!');
-});
-
 
 // Buttons functions
 // Goes forward
 function forward() {
-  socket.emit('move', '255,255,');
+  sendData("<M 255 255>");
 }
 
 // Goes left
 function left() {
-  socket.emit('move', '-255,255,');
+    sendData("<M -255 255>");
 }
 
 // Goes back
 function back() {
-  socket.emit('move', '-255,-255,');
+    sendData("<M -255 -255>");
 }
 
 // Goes right
 function right() {
-  socket.emit('move', '255,-255,');
+    sendData("<M 255 -255>");
 }
 
 
@@ -209,7 +314,8 @@ function movement() {
   // This part is used because the function is called every 50 milliseconds
   // it is used in order to not send data when it is not required
   if (LEFT || RIGHT || FORWARD || BACK) {
-    socket.emit('move', motor1 + "," + motor2 + ",");
+      sendData("<M " + motor1 + "," + motor2 + ">");
+//     socket.emit('move', motor1 + "," + motor2 + ",");
   }
 
   if (isGp) {
@@ -231,7 +337,78 @@ function movement() {
 }
 
 
-setInterval (update, 20);
+function changeLEDStripPWM () {
+    var newPWM = 0;
+
+    if (isPressed.R) {
+        newPWM += 255;
+    }
+    if (isPressed.F) {
+        newPWM -= 255;
+    }
+    // Min PWM will be 0 always
+    if (newPWM < 0) {
+        newPWM = 0;
+    }
+    if (newPWM > maxPWM) {
+        newPWM = maxPWM;
+    }
+
+    if (isPressed.R || isPressed.F) {
+        if (LEDSTRIPSEND) {
+            sendData("<L1 " + newPWM + ">");
+            LEDSTRIPSEND = false;
+        }
+    }
+}
+
+
+function botMove() {
+    var newPWMLeft = 0;
+    var newPWMRight = 0;
+
+    if (isPressed.W) {
+        newPWMLeft += 255;
+        newPWMRight += 255;
+    }
+    if (isPressed.S) {
+        newPWMLeft -= 255;
+        newPWMRight -= 255;
+    }
+    if (isPressed.D) {
+        newPWMLeft += 255;
+        newPWMRight -= 255;
+    }
+    if (isPressed.A) {
+        newPWMLeft -= 255;
+        newPWMRight += 255;
+    }
+
+    if (newPWMLeft > 255) {
+        newPWMLeft = 255;
+    }
+    if (newPWMLeft < -255) {
+        newPWMLeft = -255;
+    }
+    if (newPWMRight > 255) {
+        newPWMRight = 255;
+    }
+    if (newPWMRight < -255) {
+        newPWMRight = -255;
+    }
+
+    if (isPressed.W || isPressed.S || isPressed.D || isPressed.A) {
+        if (MOVE) {
+            sendData("<M " + newPWMLeft + ", " + newPWMRight + ">");
+            MOVE = false;
+        }
+    }
+}
+
+
+
+setInterval (update, 30);
 function update() {
-    movement();
+    changeLEDStripPWM();
+    botMove();
 }
